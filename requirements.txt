@@ -1,2 +1,5 @@
 # general modules
 django >3.2,<3.3
+
+# 3rd party modules
+environs

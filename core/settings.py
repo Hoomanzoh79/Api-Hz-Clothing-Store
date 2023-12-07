@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #DRF
+    'rest_framework',
 
     # my apps
     'accounts',
@@ -137,3 +139,18 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # Login Redirect Url
 LOGIN_REDIRECT_URL = 'index'
+
+
+# rest_framework
+
+REST_FRAMEWORK = {
+    # Documentation
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    # Authentication
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}

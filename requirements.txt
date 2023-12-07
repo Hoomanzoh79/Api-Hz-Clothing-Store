@@ -1,5 +1,8 @@
 # general modules
 django >3.2,<3.3
+djangorestframework
+markdown
+django-filter
 
 # 3rd party modules
 environs

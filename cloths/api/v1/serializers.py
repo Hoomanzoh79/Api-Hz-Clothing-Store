@@ -7,6 +7,7 @@ class ClothSerializer(serializers.ModelSerializer):
         model = Cloth
         fields = ['id',
                   'title',
+                  'author',
                   'description',
                   'price',
                   'active',

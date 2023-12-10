@@ -9,6 +9,7 @@ class Cloth(models.Model):
     GENDER_CHOICES = [('male', 'male'),
                       ('female', 'female'), ]
 
+    author = models.ForeignKey('accounts.Profile',on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     price = models.PositiveIntegerField(default=True)

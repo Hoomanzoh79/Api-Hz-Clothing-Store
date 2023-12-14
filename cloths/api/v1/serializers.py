@@ -4,7 +4,7 @@ from accounts.models import Profile
 
 class ClothSerializer(serializers.ModelSerializer):
     # relative_path = serializers.URLField(source='api_get_absolute_url',read_only=True)
-    absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url',)
+    absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url')
     class Meta:
         model = Cloth
         fields = ['id',
@@ -29,3 +29,12 @@ class ClothSerializer(serializers.ModelSerializer):
     def get_absolute_url(self,obj):
         request = self.context.get("request")
         return request.build_absolute_uri(obj.pk)
+    
+    def to_representation(self, instance):
+        request = self.context.get("request")
+        rep = super().to_representation(instance)
+        if request.parser_context["kwargs"].get("pk"):
+            rep.pop("absolute_url", None)
+        else:
+            rep.pop("description", None)
+        return rep

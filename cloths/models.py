@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-
+from django.urls import reverse
 
 class Cloth(models.Model):
     SEASON_CHOICES = [('winter', 'winter'),
@@ -23,3 +23,6 @@ class Cloth(models.Model):
 
     def __str__(self):
         return self.title
+
+    def api_get_absolute_url(self):
+        return reverse('cloths:api-v1:cloth-detail',kwargs={"pk" : self.pk})

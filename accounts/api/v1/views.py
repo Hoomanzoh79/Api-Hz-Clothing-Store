@@ -5,6 +5,7 @@ from rest_framework import status
 
 
 class RegistrationApiView(GenericAPIView):
+    """For Registering New Users"""
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):

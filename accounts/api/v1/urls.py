@@ -4,5 +4,8 @@ from . import views
 app_name = 'api-v1'
 
 urlpatterns = [
+    # signup
     path("registration/",views.RegistrationApiView.as_view(),name='registration'),
+    # token login and logout
+    path("token/login/",views.CustomAuthToken.as_view(),name="token-login"),
 ]

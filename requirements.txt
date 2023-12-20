@@ -8,3 +8,4 @@ django-filter
 environs
 Pillow
 drf-yasg[validation]
+djangorestframework-simplejwt

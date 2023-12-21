@@ -8,9 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import RegistrationSerializer,CustomAuthTokenSerializer,CustomTokenObtainPairSerializer
+from .serializers import (RegistrationSerializer,CustomAuthTokenSerializer,CustomTokenObtainPairSerializer)
+
 class RegistrationApiView(GenericAPIView):
-    """For Registering New Users"""
+    """For registering new users"""
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
@@ -21,6 +22,7 @@ class RegistrationApiView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomAuthToken(ObtainAuthToken):
+    """For token login"""
     serializer_class = CustomAuthTokenSerializer
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
@@ -35,10 +37,12 @@ class CustomAuthToken(ObtainAuthToken):
         })
 
 class DiscardAuthToken(APIView):
+    """For token logout"""
     permission_classes = [IsAuthenticated]
     def post(self,request):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """For jwt login"""
     serializer_class = CustomTokenObtainPairSerializer

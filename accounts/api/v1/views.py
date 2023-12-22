@@ -55,7 +55,6 @@ class ChangePasswordApiView(GenericAPIView):
     """
     An endpoint for changing password
     """
-
     serializer_class = ChangePasswordSerializer
     permission_classes = (IsAuthenticated,)
 

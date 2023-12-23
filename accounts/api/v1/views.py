@@ -7,11 +7,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.generics import RetrieveUpdateAPIView
+from django.shortcuts import get_object_or_404
 
 from .serializers import (RegistrationSerializer,
                           CustomAuthTokenSerializer,
                           CustomTokenObtainPairSerializer,
-                          ChangePasswordSerializer,)
+                          ChangePasswordSerializer,ProfileSerializer)
+from accounts.models import User,Profile
 
 class RegistrationApiView(GenericAPIView):
     """For registering new users"""
@@ -82,3 +85,14 @@ class ChangePasswordApiView(GenericAPIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProfileApiView(RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    
+    def get_object(self):
+        """getting user without pk or lookup field"""
+        queryset = self.get_queryset()
+        # getting the user that's logged in
+        logged_in_user = get_object_or_404(queryset, user=self.request.user)
+        return logged_in_user

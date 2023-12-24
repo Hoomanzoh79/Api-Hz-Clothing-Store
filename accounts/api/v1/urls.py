@@ -24,4 +24,7 @@ urlpatterns = [
 
     # profile
     path("profile/",views.ProfileApiView.as_view(),name="profile"),
+
+    # send email
+    path("send-email/",views.send_email,name="send-email"),
 ]

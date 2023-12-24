@@ -9,6 +9,8 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.generics import RetrieveUpdateAPIView
 from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
 
 from .serializers import (RegistrationSerializer,
                           CustomAuthTokenSerializer,
@@ -89,6 +91,7 @@ class ChangePasswordApiView(GenericAPIView):
 class ProfileApiView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
+    permission_classes = [IsAuthenticated]
     
     def get_object(self):
         """getting user without pk or lookup field"""
@@ -96,3 +99,8 @@ class ProfileApiView(RetrieveUpdateAPIView):
         # getting the user that's logged in
         logged_in_user = get_object_or_404(queryset, user=self.request.user)
         return logged_in_user
+
+def send_email(request):
+    email = EmailMessage('Subject', 'Body', to=['your@email.com'])
+    email.send()
+    return HttpResponse('Email sent!')

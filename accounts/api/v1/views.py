@@ -9,8 +9,11 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.generics import RetrieveUpdateAPIView
 from django.shortcuts import get_object_or_404
-from django.core.mail import EmailMessage
-from django.http import HttpResponse
+from mail_templated import EmailMessage
+from rest_framework_simplejwt.tokens import RefreshToken
+import jwt
+from django.conf import settings
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 
 from .serializers import (RegistrationSerializer,
                           CustomAuthTokenSerializer,
@@ -100,7 +103,60 @@ class ProfileApiView(RetrieveUpdateAPIView):
         logged_in_user = get_object_or_404(queryset, user=self.request.user)
         return logged_in_user
 
-def send_email(request):
-    email = EmailMessage('Subject', 'Body', to=['your@email.com'])
-    email.send()
-    return HttpResponse('Email sent!')
+class TestEmailSend(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        # you can use threading to send emails faster
+        user = request.user
+        message = EmailMessage('email/hello.tpl', {'user': user}, "admin@gmail.com",
+                        to=[user.email])
+        message.send()
+        return Response("email sent!")
+
+class UserActivationApiView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,*args, **kwargs):
+        # you can use threading to send emails faster
+        user = request.user
+        if not user.is_verified:
+            token = self.get_tokens_for_user(user)
+            message = EmailMessage('email/activation.tpl',{'user': user,'token':token}, "admin@gmail.com",
+                            to=[user.email])
+            message.send()
+            return Response("email sent!")
+        return Response("user already verified")
+    
+    def get_tokens_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
+
+class UserActivationConfirmApiView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, token, *args, **kwargs):
+        # decode token
+        try:
+            token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            # find user id
+            user_id = token.get("user_id")
+        # exception handlings
+        except ExpiredSignatureError:
+            return Response(
+                {"details": "token has been expired"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except InvalidSignatureError:
+            return Response(
+                {"details": "token is invalid"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        # find user from id
+        user = get_object_or_404(User, pk=user_id)
+        # for users that are already verified
+        if user.is_verified:
+            return Response({"details": "your account has already been verified"})
+        # activate user
+        user.is_verified = True
+        user.save()
+        return Response({"details": "your account has been verified"})

@@ -26,5 +26,11 @@ urlpatterns = [
     path("profile/",views.ProfileApiView.as_view(),name="profile"),
 
     # send email
-    path("send-email/",views.send_email,name="send-email"),
+    path("send-email/",views.TestEmailSend.as_view(),name="send-email"),
+
+    # user activation
+    path("activation/",views.UserActivationApiView.as_view(),name="activation"),
+
+    # user activation confirm
+    path("activation/confirm/<str:token>/",views.UserActivationConfirmApiView.as_view(),name="activation-confirm"),
 ]

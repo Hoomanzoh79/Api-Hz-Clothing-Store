@@ -29,8 +29,25 @@ class RegistrationApiView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(data=request.data, status=status.HTTP_201_CREATED)
+            user_email = serializer.validated_data["email"]
+            data = {
+                "email": user_email,
+            }
+            user_obj = get_object_or_404(User, email=user_email)
+            token = self.get_tokens_for_user(user_obj)
+            message = EmailMessage(
+                "email/activation.tpl",
+                {"token": token},
+                "admin@admin.com",
+                to=[user_email],
+            )
+            message.send()
+            return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get_tokens_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
 
 class CustomAuthToken(ObtainAuthToken):
     """For token login"""
@@ -64,7 +81,7 @@ class ChangePasswordApiView(GenericAPIView):
     An endpoint for changing password
     """
     serializer_class = ChangePasswordSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self, queryset=None):
         obj = self.request.user
@@ -132,8 +149,6 @@ class UserActivationApiView(GenericAPIView):
         return str(refresh.access_token)
 
 class UserActivationConfirmApiView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, token, *args, **kwargs):
         # decode token
         try:

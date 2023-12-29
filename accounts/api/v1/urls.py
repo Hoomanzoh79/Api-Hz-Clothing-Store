@@ -33,4 +33,10 @@ urlpatterns = [
 
     # user activation confirm
     path("activation/confirm/<str:token>/",views.UserActivationConfirmApiView.as_view(),name="activation-confirm"),
+
+    # reset password
+    path("password/reset/",views.ResetPasswordApiView.as_view(),name='reset-password'),
+
+    # reset password confirm
+    path("password/reset/confirm/<str:token>/",views.ResetPasswordConfirmApiView.as_view(),name="reset-password-confirm"),
 ]

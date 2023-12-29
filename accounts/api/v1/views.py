@@ -18,7 +18,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 from .serializers import (RegistrationSerializer,
                           CustomAuthTokenSerializer,
                           CustomTokenObtainPairSerializer,
-                          ChangePasswordSerializer,ProfileSerializer)
+                          ChangePasswordSerializer,ProfileSerializer,ResetPasswordSerializer,ResetPasswordConfirmSerializer)
 from accounts.models import User,Profile
 
 class RegistrationApiView(GenericAPIView):
@@ -175,3 +175,57 @@ class UserActivationConfirmApiView(GenericAPIView):
         user.is_verified = True
         user.save()
         return Response({"details": "your account has been verified"})
+
+
+class ResetPasswordApiView(GenericAPIView):
+    serializer_class = ResetPasswordSerializer
+
+    def post(self, request,*args, **kwargs):
+        # you can use threading to send emails faster
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user_email = serializer.validated_data["email"]
+            user = get_object_or_404(User,email=user_email)
+            token = self.get_tokens_for_user(user)
+            message = EmailMessage('email/reset_password.tpl',{'user': user,'token':token}, "admin@gmail.com",
+                            to=[user_email])
+            message.send()
+            return Response("reset password email has been sent")
+        return Response(serializer.errors)
+
+    def get_tokens_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
+
+class ResetPasswordConfirmApiView(GenericAPIView):
+    serializer_class = ResetPasswordConfirmSerializer
+
+    def post(self, request,token, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # decode token
+            try:
+                token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+                # find user id
+                user_id = token.get("user_id")
+            # exception handlings
+            except ExpiredSignatureError:
+                return Response(
+                    {"details": "token has been expired"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            except InvalidSignatureError:
+                return Response(
+                    {"details": "token is invalid"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # find user from id
+            user = get_object_or_404(User, pk=user_id)
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
+            return Response(
+                {"details": "password has been reset successfully"},
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

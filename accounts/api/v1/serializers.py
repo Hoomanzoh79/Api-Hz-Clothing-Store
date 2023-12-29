@@ -101,10 +101,23 @@ class ResetPasswordSerializer(serializers.Serializer):
         email = attrs.get("email")
         try:
             user = get_object_or_404(User,email=email)
-        except User.DoesNotExist:
+        except:
             raise serializers.ValidationError(
                 {"detail": "user does not exist with this email"}
             )
 
         attrs["user"] = user
+        return super().validate(attrs)
+
+class ResetPasswordConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+    new_password1 = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs.get("new_password") != attrs.get("new_password1"):
+            raise serializers.ValidationError({"detail":"given passwords doesn't match"})
+        try:
+            validate_password(attrs.get("new_password"))
+        except exceptions.ValidationError as e:
+            raise serializers.ValidationError({"new_password": list(e.messages)})
         return super().validate(attrs)

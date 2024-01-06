@@ -1,9 +1,19 @@
 from rest_framework import serializers
-from cloths.models import Cloth
+from django.urls import reverse
+
+from cloths.models import Cloth,Comment
 from accounts.models import Profile
+
+class CommentSerializer(serializers.ModelSerializer):
+    cloth = serializers.StringRelatedField(read_only=True)
+    author = serializers.ReadOnlyField(source='author.email')
+    class Meta:
+        model = Comment
+        fields = "__all__"
 
 class ClothSerializer(serializers.ModelSerializer):
     # relative_path = serializers.URLField(source='api_get_absolute_url',read_only=True)
+    comments = serializers.SerializerMethodField(method_name="get_comments")
     absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url')
     class Meta:
         model = Cloth
@@ -17,9 +27,16 @@ class ClothSerializer(serializers.ModelSerializer):
                   'gender',
                   'absolute_url',
                   'datetime_created',
-                  'datetime_modified',]
+                  'datetime_modified',
+                  "comments",]
         
         read_only_fields = ['author']
+    
+    def get_comments(self, obj):
+        comments = Comment.objects.filter(cloth=obj)[:3]
+        return {
+            "comments": CommentSerializer(comments, many=True).data,
+        }
     
     def create(self, validated_data):
         request = self.context.get("request")

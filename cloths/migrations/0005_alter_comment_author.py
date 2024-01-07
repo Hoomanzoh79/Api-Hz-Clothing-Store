@@ -5,16 +5,20 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0002_profile'),
-        ('cloths', '0004_alter_comment_author'),
+        ("accounts", "0002_profile"),
+        ("cloths", "0004_alter_comment_author"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='author',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='comments', to='accounts.profile'),
+            model_name="comment",
+            name="author",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="comments",
+                to="accounts.profile",
+            ),
         ),
     ]

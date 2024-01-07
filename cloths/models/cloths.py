@@ -5,13 +5,17 @@ from django.utils.translation import gettext as _
 
 
 class Cloth(models.Model):
-    SEASON_CHOICES = [('winter', 'winter'),
-                       ('summer', 'summer'),
-                       ('fall', 'fall'), ]
-    GENDER_CHOICES = [('male', 'male'),
-                      ('female', 'female'), ]
+    SEASON_CHOICES = [
+        ("winter", "winter"),
+        ("summer", "summer"),
+        ("fall", "fall"),
+    ]
+    GENDER_CHOICES = [
+        ("male", "male"),
+        ("female", "female"),
+    ]
 
-    author = models.ForeignKey('accounts.Profile',on_delete=models.CASCADE,null=True)
+    author = models.ForeignKey("accounts.Profile", on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     price = models.PositiveIntegerField(default=True)
@@ -27,4 +31,4 @@ class Cloth(models.Model):
         return self.title
 
     def api_get_absolute_url(self):
-        return reverse('cloths:api-v1:cloth-detail',kwargs={"pk" : self.pk})
+        return reverse("cloths:api-v1:cloth-detail", kwargs={"pk": self.pk})

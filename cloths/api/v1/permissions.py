@@ -5,7 +5,7 @@ class IsOwnerOrReadOnlyForProfile(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit it.
     Assumes the model instance has an `owner` attribute.
-    ** for models that author is based on Profile 
+    ** for models that author is based on Profile
     """
 
     def has_object_permission(self, request, view, obj):
@@ -16,6 +16,7 @@ class IsOwnerOrReadOnlyForProfile(permissions.BasePermission):
 
         # Instance must have an attribute named `author`.
         return obj.author.user == request.user
+
 
 class IsOwnerOrReadOnlyForUser(permissions.BasePermission):
     """

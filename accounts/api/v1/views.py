@@ -15,14 +15,21 @@ import jwt
 from django.conf import settings
 from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 
-from .serializers import (RegistrationSerializer,
-                          CustomAuthTokenSerializer,
-                          CustomTokenObtainPairSerializer,
-                          ChangePasswordSerializer,ProfileSerializer,ResetPasswordSerializer,ResetPasswordConfirmSerializer)
-from accounts.models import User,Profile
+from .serializers import (
+    RegistrationSerializer,
+    CustomAuthTokenSerializer,
+    CustomTokenObtainPairSerializer,
+    ChangePasswordSerializer,
+    ProfileSerializer,
+    ResetPasswordSerializer,
+    ResetPasswordConfirmSerializer,
+)
+from accounts.models import User, Profile
+
 
 class RegistrationApiView(GenericAPIView):
     """For registering new users"""
+
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
@@ -44,35 +51,46 @@ class RegistrationApiView(GenericAPIView):
             message.send()
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
 
+
 class CustomAuthToken(ObtainAuthToken):
     """For token login"""
+
     serializer_class = CustomAuthTokenSerializer
+
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'email': user.email,
-        })
+        return Response(
+            {
+                "token": token.key,
+                "user_id": user.pk,
+                "email": user.email,
+            }
+        )
+
 
 class DiscardAuthToken(APIView):
     """For token logout"""
+
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     """For jwt login"""
+
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -80,8 +98,11 @@ class ChangePasswordApiView(GenericAPIView):
     """
     An endpoint for changing password
     """
+
     serializer_class = ChangePasswordSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_object(self, queryset=None):
         obj = self.request.user
@@ -108,11 +129,12 @@ class ChangePasswordApiView(GenericAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ProfileApiView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
     permission_classes = [IsAuthenticated]
-    
+
     def get_object(self):
         """getting user without pk or lookup field"""
         queryset = self.get_queryset()
@@ -120,33 +142,42 @@ class ProfileApiView(RetrieveUpdateAPIView):
         logged_in_user = get_object_or_404(queryset, user=self.request.user)
         return logged_in_user
 
+
 class TestEmailSend(GenericAPIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         # you can use threading to send emails faster
         user = request.user
-        message = EmailMessage('email/hello.tpl', {'user': user}, "admin@gmail.com",
-                        to=[user.email])
+        message = EmailMessage(
+            "email/hello.tpl", {"user": user}, "admin@gmail.com", to=[user.email]
+        )
         message.send()
         return Response("email sent!")
+
 
 class UserActivationApiView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request,*args, **kwargs):
+    def get(self, request, *args, **kwargs):
         # you can use threading to send emails faster
         user = request.user
         if not user.is_verified:
             token = self.get_tokens_for_user(user)
-            message = EmailMessage('email/activation.tpl',{'user': user,'token':token}, "admin@gmail.com",
-                            to=[user.email])
+            message = EmailMessage(
+                "email/activation.tpl",
+                {"user": user, "token": token},
+                "admin@gmail.com",
+                to=[user.email],
+            )
             message.send()
             return Response("email sent!")
         return Response("user already verified")
-    
+
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+
 
 class UserActivationConfirmApiView(GenericAPIView):
     def get(self, request, token, *args, **kwargs):
@@ -180,15 +211,19 @@ class UserActivationConfirmApiView(GenericAPIView):
 class ResetPasswordApiView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
 
-    def post(self, request,*args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # you can use threading to send emails faster
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user_email = serializer.validated_data["email"]
-            user = get_object_or_404(User,email=user_email)
+            user = get_object_or_404(User, email=user_email)
             token = self.get_tokens_for_user(user)
-            message = EmailMessage('email/reset_password.tpl',{'user': user,'token':token}, "admin@gmail.com",
-                            to=[user_email])
+            message = EmailMessage(
+                "email/reset_password.tpl",
+                {"user": user, "token": token},
+                "admin@gmail.com",
+                to=[user_email],
+            )
             message.send()
             return Response("reset password email has been sent")
         return Response(serializer.errors)
@@ -197,10 +232,11 @@ class ResetPasswordApiView(GenericAPIView):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
 
+
 class ResetPasswordConfirmApiView(GenericAPIView):
     serializer_class = ResetPasswordConfirmSerializer
 
-    def post(self, request,token, *args, **kwargs):
+    def post(self, request, token, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():

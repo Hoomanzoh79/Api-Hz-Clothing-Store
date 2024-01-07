@@ -1,0 +1,12 @@
+[flake8]
+extend-ignore = E501,W293
+exclude =
+    .git,
+    .gitignore,
+    *.pot,
+    *.py[co],
+    __pycache__,
+    .venv,
+    .env,
+    settings.py,
+    __init__.py,

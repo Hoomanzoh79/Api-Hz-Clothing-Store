@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly,IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import generics
@@ -18,7 +18,7 @@ from .permissions import IsOwnerOrReadOnlyForProfile, IsOwnerOrReadOnlyForUser
 class ClothModelViewSet(viewsets.ModelViewSet):
     serializer_class = ClothSerializer
     queryset = Cloth.objects.filter(active=True)
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnlyForProfile]
+    permission_classes = [DjangoModelPermissionsOrAnonReadOnly, IsOwnerOrReadOnlyForProfile]
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = {

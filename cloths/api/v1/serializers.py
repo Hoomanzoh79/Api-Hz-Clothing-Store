@@ -58,6 +58,4 @@ class ClothSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         if request.parser_context["kwargs"].get("pk"):
             rep.pop("absolute_url", None)
-        else:
-            rep.pop("description", None)
         return rep

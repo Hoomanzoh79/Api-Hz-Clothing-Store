@@ -3,6 +3,7 @@
         "authtoken",
         "coreapi",
         "paginations",
+        "pytestmark",
         "Sduwdsdas",
         "simplejwt",
         "yasg"

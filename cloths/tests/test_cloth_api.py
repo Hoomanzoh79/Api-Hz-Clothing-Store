@@ -12,13 +12,56 @@ def api_client():
 @pytest.fixture
 def common_user():
     user = User.objects.create_user(
-        email="admin@admin.com", password="Sduwdsdas&12412", is_verified=True,
+        email="test@test.com", password="Sduwdsdas&12412", is_verified=True,
     )
     return user
 
+
+@pytest.fixture
+def super_user():
+    user = User.objects.create_superuser(
+        email="admin@admin.com", password="Sduwdsdas&1241289",
+    )
+    return user
+
+@pytest.fixture
+def data():
+    data = {"title": "test", "description": "test description",
+        "price":150000,"active":True,"season":"winter","gender":"male",}
+    return data
+
 @pytest.mark.django_db
 class TestClothApi():
-    def test_get_cloth_response_200_status(self, api_client):
+    def test_get_cloth_unauthorized_response_200_status(self, api_client):
         url = reverse("cloths:api-v1:cloth-list")
         response = api_client.get(url)
         assert response.status_code == 200
+
+    def test_post_cloth_unauthorized_response_401_status(self, api_client,data):
+        url = reverse("cloths:api-v1:cloth-list")
+        response = api_client.post(url,data)
+        assert response.status_code == 401
+    
+    def test_post_cloth_common_user_response_403_status(self, api_client,common_user,data):
+        url = reverse("cloths:api-v1:cloth-list")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data)
+        assert response.status_code == 403
+
+    def test_post_cloth_super_user_response_201_status(self, api_client,super_user,data):
+        url = reverse("cloths:api-v1:cloth-list")
+        user = super_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data)
+        assert response.status_code == 201
+    
+    def test_post_cloth_super_user_data(self, api_client,super_user,data):
+        url = reverse("cloths:api-v1:cloth-list")
+        user = super_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data)
+
+        assert response.data["title"] == "test"
+        assert response.data["description"] == "test description"
+        assert response.data["price"] == 150000

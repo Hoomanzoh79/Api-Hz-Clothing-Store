@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from rest_framework import serializers
 from django.core import exceptions
 from django.contrib.auth.password_validation import validate_password
@@ -18,6 +17,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ["email", "password", "password1"]
 
     def validate(self, attrs):
+        email = attrs.get("email")
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError({"detail":"user with this email already exists"})
+        
         if attrs.get("password") != attrs.get("password1"):
             raise serializers.ValidationError({"detail": "passwords doesn't match "})
         try:

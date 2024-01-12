@@ -33,16 +33,19 @@ def data():
 @pytest.mark.django_db
 class TestClothApi():
     def test_get_cloth_unauthorized_response_200_status(self, api_client):
+        "Tests if unauthorized user's get request to cloth-list is successful"
         url = reverse("cloths:api-v1:cloth-list")
         response = api_client.get(url)
         assert response.status_code == 200
 
     def test_post_cloth_unauthorized_response_401_status(self, api_client,data):
+        "Tests if unauthorized users can't create new cloth or post request is not successful"
         url = reverse("cloths:api-v1:cloth-list")
         response = api_client.post(url,data)
         assert response.status_code == 401
     
     def test_post_cloth_common_user_response_403_status(self, api_client,common_user,data):
+        "Tests if common users can't create new cloth or post request is not successful"
         url = reverse("cloths:api-v1:cloth-list")
         user = common_user
         api_client.force_authenticate(user=user)
@@ -50,6 +53,7 @@ class TestClothApi():
         assert response.status_code == 403
 
     def test_post_cloth_super_user_response_201_status(self, api_client,super_user,data):
+        "Tests if superusers can create new cloth or post request is successful"
         url = reverse("cloths:api-v1:cloth-list")
         user = super_user
         api_client.force_authenticate(user=user)
@@ -57,6 +61,7 @@ class TestClothApi():
         assert response.status_code == 201
     
     def test_post_cloth_invalid_data_response_400_status(self, api_client,super_user):
+        "Tests if superusers can't create new cloth with invalid data"
         url = reverse("cloths:api-v1:cloth-list")
         user = super_user
         api_client.force_authenticate(user=user)
@@ -64,6 +69,7 @@ class TestClothApi():
         assert response.status_code == 400
         
     def test_post_cloth_super_user_data(self, api_client,super_user,data):
+        "Tests the content of the created cloth"
         url = reverse("cloths:api-v1:cloth-list")
         user = super_user
         api_client.force_authenticate(user=user)

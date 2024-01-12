@@ -24,6 +24,7 @@ from .serializers import (
     ResetPasswordSerializer,
     ResetPasswordConfirmSerializer,
 )
+from accounts.permissions import IsNotAuthenticated
 from accounts.models import User, Profile
 
 
@@ -31,6 +32,7 @@ class RegistrationApiView(GenericAPIView):
     """For registering new users"""
 
     serializer_class = RegistrationSerializer
+    permission_classes = [IsNotAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)

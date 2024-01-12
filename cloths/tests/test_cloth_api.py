@@ -56,6 +56,13 @@ class TestClothApi():
         response = api_client.post(url,data)
         assert response.status_code == 201
     
+    def test_post_cloth_invalid_data_response_400_status(self, api_client,super_user):
+        url = reverse("cloths:api-v1:cloth-list")
+        user = super_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data={"title":"test invalid data","description":"test invalid description"})
+        assert response.status_code == 400
+        
     def test_post_cloth_super_user_data(self, api_client,super_user,data):
         url = reverse("cloths:api-v1:cloth-list")
         user = super_user

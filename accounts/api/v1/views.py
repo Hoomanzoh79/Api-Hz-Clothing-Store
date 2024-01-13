@@ -61,7 +61,7 @@ class RegistrationApiView(GenericAPIView):
 
 class CustomAuthToken(ObtainAuthToken):
     """For token login"""
-
+    permission_classes = [IsNotAuthenticated]
     serializer_class = CustomAuthTokenSerializer
 
     def post(self, request, *args, **kwargs):

@@ -42,3 +42,14 @@ class TestAccountApi():
         "password1":"ASDADASDWw121",
         })
         assert response.status_code == 400
+    
+    def test_unauthorized_registration_invalid_password_400_status(self,api_client):
+        """checks if unauthorized user can't do registration with 
+        invalid data(password too common,too short and entirely numeric)"""
+        url = reverse("accounts:api-v1:registration")
+        response = api_client.post(url,data={
+        "email":"test@test.com",
+        "password":"1234",
+        "password1":"1234",
+        })
+        assert response.status_code == 400

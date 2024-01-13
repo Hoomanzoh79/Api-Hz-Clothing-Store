@@ -37,19 +37,19 @@ def data():
 @pytest.mark.django_db
 class TestCommentApi():
     def test_get_comment_list_unauthorized_response_200_status(self, api_client,cloth_example):
-        "Tests if unauthorized user's get request to comment list is successful"
+        """Tests if unauthorized user's get request to comment list is successful"""
         url = reverse("cloths:api-v1:comment_list",args=[cloth_example.id])
         response = api_client.get(url)
         assert response.status_code == 200
     
     def test_post_comment_list_unauthorized_response_401_status(self, api_client,cloth_example,data):
-        "Tests if unauthorized users can't create new comment or post request is not successful"
+        """Tests if unauthorized users can't create new comment or post request is not successful"""
         url = reverse("cloths:api-v1:comment_list",args=[cloth_example.id])
         response = api_client.post(url,data=data)
         assert response.status_code == 401
         
     def test_post_comment_list_authorized_response_201_status(self, api_client,common_user,cloth_example,data):
-        "Tests if authorized users can create new comment or post request is successful"
+        """Tests if authorized users can create new comment or post request is successful"""
         url = reverse("cloths:api-v1:comment_list",args=[cloth_example.id])
         user = common_user
         api_client.force_authenticate(user=user)
@@ -57,7 +57,7 @@ class TestCommentApi():
         assert response.status_code == 201
     
     def test_get_comment_detail_response_200_status(self, api_client,cloth_example,comment_example):
-        "Tests if all the user's get requests to comment detail is successful"
+        """Tests if all the user's get requests to comment detail is successful"""
         url = reverse("cloths:api-v1:comment_detail",args=[cloth_example.id,comment_example.id])
         response = api_client.get(url)
         assert response.status_code == 200
@@ -65,7 +65,7 @@ class TestCommentApi():
         assert response.data["cloth"] == cloth_example.title
 
     def test_get_comment_detail_invalid_id_response_400_status(self, api_client,comment_example):
-        "Tests if all the user's get requests to comment detail is not successful with invalid cloth id"
+        """Tests if all the user's get requests to comment detail is not successful with invalid cloth id"""
         url = reverse("cloths:api-v1:comment_detail",args=[3123132,comment_example.id])
         response = api_client.get(url)
         assert response.status_code == 400

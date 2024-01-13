@@ -19,7 +19,7 @@ def common_user():
 @pytest.fixture
 def data():
     data = {
-        "email":"test@test.com",
+        "email":"test@gmail.com",
         "password":"XsKKJEW2121",
         "password1":"XsKKJEW2121",
     }
@@ -32,6 +32,7 @@ class TestAccountApi():
         url = reverse("accounts:api-v1:registration")
         response = api_client.post(url,data=data)
         assert response.status_code == 201
+        assert response.data["email"] == data["email"]
     
     def test_unauthorized_registration_password_not_match_400_status(self,api_client):
         """Tests if unauthorized user can't do registration with invalid data(passwords doesn't match)"""
@@ -53,3 +54,11 @@ class TestAccountApi():
         "password1":"1234",
         })
         assert response.status_code == 400
+    
+    def test_authorized_registration_403_status(self,api_client,data,common_user):
+        """Tests if authorized user can't do registration"""
+        url = reverse("accounts:api-v1:registration")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data=data)
+        assert response.status_code == 403

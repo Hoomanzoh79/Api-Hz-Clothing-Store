@@ -17,7 +17,7 @@ def common_user():
     return user
 
 @pytest.fixture
-def data():
+def registration_data():
     data = {
         "email":"test@gmail.com",
         "password":"XsKKJEW2121",
@@ -25,14 +25,21 @@ def data():
     }
     return data
 
+@pytest.fixture
+def login_data():
+    data = {
+        "email":"test@test.com",
+        "password":"Sduwdsdas&12412",
+    }
+    return data
 @pytest.mark.django_db
 class TestAccountApi():
-    def test_unauthorized_registration_201_status(self,api_client,data):
+    def test_unauthorized_registration_201_status(self,api_client,registration_data):
         """Tests if unauthorized user can do registration with valid data"""
         url = reverse("accounts:api-v1:registration")
-        response = api_client.post(url,data=data)
+        response = api_client.post(url,data=registration_data)
         assert response.status_code == 201
-        assert response.data["email"] == data["email"]
+        assert response.data["email"] == registration_data["email"]
     
     def test_unauthorized_registration_password_not_match_400_status(self,api_client):
         """Tests if unauthorized user can't do registration with invalid data(passwords doesn't match)"""
@@ -55,10 +62,27 @@ class TestAccountApi():
         })
         assert response.status_code == 400
     
-    def test_authorized_registration_403_status(self,api_client,data,common_user):
+    def test_authorized_registration_403_status(self,api_client,registration_data,common_user):
         """Tests if authorized user can't do registration"""
         url = reverse("accounts:api-v1:registration")
         user = common_user
         api_client.force_authenticate(user=user)
-        response = api_client.post(url,data=data)
+        response = api_client.post(url,data=registration_data)
         assert response.status_code == 403
+    
+    def test_unauthorized_token_login_status_200(self,api_client,login_data,common_user):
+        """Tests if unauthorized user can log in with token-login"""
+        url = reverse("accounts:api-v1:token-login")
+        response = api_client.post(url,data=login_data)
+        assert response.status_code == 200
+        assert response.data["email"] == login_data["email"]
+        assert response.data["user_id"] == common_user.id
+    
+    def test_unauthorized_token_login_invalid_data_status_400(self,api_client,common_user):
+        """Tests if unauthorized user can't log in with invalid data"""
+        url = reverse("accounts:api-v1:token-login")
+        response = api_client.post(url,data={
+        "email":"invalid_email@gmail.com",
+        "password":"Sduwdsdas&12412",
+        })
+        assert response.status_code == 400

@@ -86,3 +86,11 @@ class TestAccountApi():
         "password":"Sduwdsdas&12412",
         })
         assert response.status_code == 400
+    
+    def test_authorized_token_login_status_403(self,api_client,login_data,common_user):
+        """Tests if authorized user can't log in with token-login(or can't login at all)"""
+        url = reverse("accounts:api-v1:token-login")
+        user= common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.post(url,data=login_data)
+        assert response.status_code == 403

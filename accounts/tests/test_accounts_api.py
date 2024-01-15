@@ -88,9 +88,26 @@ class TestAccountApi():
         assert response.status_code == 400
     
     def test_authorized_token_login_status_403(self,api_client,login_data,common_user):
-        """Tests if authorized user can't log in with token-login(or can't login at all)"""
+        """Tests if authorized user can't log in with token-login"""
         url = reverse("accounts:api-v1:token-login")
         user= common_user
         api_client.force_authenticate(user=user)
         response = api_client.post(url,data=login_data)
         assert response.status_code == 403
+    
+    def test_authorized_token_logout_status_204(self,api_client,common_user,login_data):
+        """Tests if authorized user can log out with token-logout and if their auth_token is deleted"""
+        url = reverse("accounts:api-v1:token-login")
+        api_client.post(url,data=login_data)
+        user = common_user
+        api_client.force_authenticate(user=user)
+        url = reverse("accounts:api-v1:token-logout")
+        response = api_client.post(url)
+        assert response.status_code == 204
+        assert user.auth_token != True
+    
+    def test_unauthorized_token_logout_status_401(self,api_client):
+        """Tests if unauthorized user can't log out with token-logout"""
+        url = reverse("accounts:api-v1:token-logout")
+        response = api_client.post(url)
+        assert response.status_code == 401

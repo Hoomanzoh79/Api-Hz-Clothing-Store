@@ -1,12 +1,22 @@
 import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User
 
 @pytest.fixture
 def api_client():
     client = APIClient()
+    return client
+
+@pytest.fixture
+def api_client_for_jwt():
+    user = User.objects.create_user(email='test@test.com', password='Sduwdsdas&12412')
+    client = APIClient()
+    refresh = RefreshToken.for_user(user)
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
     return client
 
 @pytest.fixture
@@ -71,11 +81,14 @@ class TestAccountApi():
         assert response.status_code == 403
     
     def test_unauthorized_token_login_status_200(self,api_client,login_data,common_user):
-        """Tests if unauthorized user can log in with token-login"""
+        """Tests if unauthorized user can log in with token-login
+        also tests the keys that are returned from data(user_id,email,auth_token)"""
+
         url = reverse("accounts:api-v1:token-login")
         response = api_client.post(url,data=login_data)
         assert response.status_code == 200
-        assert response.data["email"] == login_data["email"]
+        assert len(response.data.keys()) == 3
+        assert response.data["email"] == common_user.email
         assert response.data["user_id"] == common_user.id
     
     def test_unauthorized_token_login_invalid_data_status_400(self,api_client,common_user):
@@ -111,3 +124,18 @@ class TestAccountApi():
         url = reverse("accounts:api-v1:token-logout")
         response = api_client.post(url)
         assert response.status_code == 401
+    
+    def test_jwt_create(self,api_client,login_data,common_user):
+        url = reverse("accounts:api-v1:jwt-create")
+        response = api_client.post(url,data=login_data)
+
+        assert response.status_code == 200
+        assert len(response.data.keys()) == 4
+        assert response.data["email"] == common_user.email
+        assert response.data["user_id"] == common_user.id
+    
+    def test_jwt_access_refresh(self,api_client_for_jwt,login_data):
+        url = reverse("accounts:api-v1:jwt-create")
+        response = api_client_for_jwt.post(url,login_data)
+
+        assert response.status_code == 200

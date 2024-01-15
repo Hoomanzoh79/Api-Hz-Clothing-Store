@@ -145,7 +145,7 @@ class ProfileApiView(RetrieveUpdateAPIView):
         return logged_in_user
 
 
-class TestEmailSend(GenericAPIView):
+class TestEmailSend(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):

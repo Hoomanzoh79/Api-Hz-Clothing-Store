@@ -61,7 +61,7 @@ class TestAccountApi():
         assert response.status_code == 201
         assert response.data["email"] == registration_data["email"]
     
-    def test_registration_password_not_match_400_status(self,api_client):
+    def test_registration_passwords_not_match_400_status(self,api_client):
         """Tests if unauthorized user can't do registration with invalid data(passwords doesn't match)"""
         url = reverse("accounts:api-v1:registration")
         response = api_client.post(url,data={
@@ -171,3 +171,19 @@ class TestAccountApi():
         "new_password1":"Aashd123!",
         })
         assert response.status_code == 400
+    
+    def test_change_password_new_passwords_not_match_status_400(self,api_client,common_user):
+        url = reverse("accounts:api-v1:change-password")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.put(url,data={
+        "old_password":"Sduwdsdas&12412",
+        "new_password":"Aashd123!&&",
+        "new_password1":"Aashd123!",
+        })
+        assert response.status_code == 400
+    
+    def test_unauthorized_change_password_status_401(self,api_client,change_password_data):
+        url = reverse("accounts:api-v1:change-password")
+        response = api_client.put(url,data=change_password_data)
+        assert response.status_code == 401

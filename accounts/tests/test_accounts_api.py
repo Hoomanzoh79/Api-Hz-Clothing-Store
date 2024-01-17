@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User
+from accounts.models import User,Profile
 
 @pytest.fixture
 def api_client():
@@ -25,6 +25,12 @@ def common_user():
         email="test@test.com", password="Sduwdsdas&12412", is_verified=True,
     )
     return user
+
+@pytest.fixture
+def profile(common_user):
+    profile = Profile.objects.create(user=common_user,first_name="test firstname",
+                                     last_name="test lastname",address="test address",)
+    return profile
 
 @pytest.fixture
 def registration_data():
@@ -187,3 +193,23 @@ class TestAccountApi():
         url = reverse("accounts:api-v1:change-password")
         response = api_client.put(url,data=change_password_data)
         assert response.status_code == 401
+    
+    def test_authorized_get_profile_status_200(self,api_client,common_user):
+        url = reverse("accounts:api-v1:profile")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+
+    def test_authorized_put_profile_status_200(self,api_client,common_user):
+        url = reverse("accounts:api-v1:profile")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.put(url,data={
+            "first_name":"test firstname**",
+            "last_name":"test lastname**",
+            "address":"test address**",
+        })
+
+        assert response.status_code == 200

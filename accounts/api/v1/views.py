@@ -227,8 +227,11 @@ class ResetPasswordApiView(GenericAPIView):
                 to=[user_email],
             )
             message.send()
-            return Response("reset password email has been sent")
-        return Response(serializer.errors)
+            return Response(
+                {"details": "reset password email has been sent to your email"},
+                status=status.HTTP_200_OK,
+                )
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)

@@ -213,3 +213,54 @@ class TestAccountApi():
         })
 
         assert response.status_code == 200
+    
+    def test_unauthorized_get_profile_status_401(self,api_client):
+        url = reverse("accounts:api-v1:profile")
+        response = api_client.get(url)
+
+        assert response.status_code == 401
+    
+    def test_authorized_user_activation_status_200(self,api_client,common_user):
+        url = reverse("accounts:api-v1:activation")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+    
+    def test_unauthorized_user_activation_status_401(self,api_client):
+        url = reverse("accounts:api-v1:activation")
+        response = api_client.get(url)
+
+        assert response.status_code == 401
+    
+    def test_user_activation_confirm_status_200(self,api_client):
+        user= User.objects.create_user(
+        email="testemail@test.com", password="JKdsdas71&", is_verified=False,
+        )
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:activation-confirm",args=[refresh.access_token])
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+        # assert user.is_verified == True
+    
+    def test_user_activation_invalid_token_status_400(self,api_client,common_user):
+        user=common_user
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:activation-confirm",args=[str(refresh.access_token)+"invalid_token"])
+        response = api_client.get(url)
+
+        assert response.status_code == 400
+
+    def test_reset_password_status_200(self,api_client,common_user):
+        url = reverse("accounts:api-v1:reset-password")
+        response = api_client.post(url,data={"email":"test@test.com"})
+
+        assert response.status_code == 200
+    
+    def test_reset_password_invalid_email_status_400(self,api_client,common_user):
+        url = reverse("accounts:api-v1:reset-password")
+        response = api_client.post(url,data={"email":"notfounduser@email.com"})
+
+        assert response.status_code == 400

@@ -253,7 +253,7 @@ class ResetPasswordConfirmApiView(GenericAPIView):
             # exception handlings
             except ExpiredSignatureError:
                 return Response(
-                    {"details": "token has been expired"},
+                    {"details": "token has been expired"}, 
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             except InvalidSignatureError:
@@ -263,7 +263,14 @@ class ResetPasswordConfirmApiView(GenericAPIView):
                 )
             # find user from id
             user = get_object_or_404(User, pk=user_id)
-            user.set_password(serializer.data.get("new_password"))
+            new_password = serializer.data.get("new_password")
+            
+            if user.check_password(new_password):
+                return Response(
+                {"details": "new password can't be equal to old password"},
+                status=status.HTTP_400_BAD_REQUEST,
+                )
+            user.set_password(new_password)
             user.save()
             return Response(
                 {"details": "password has been reset successfully"},

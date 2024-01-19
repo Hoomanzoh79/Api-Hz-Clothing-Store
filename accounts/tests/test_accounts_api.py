@@ -178,6 +178,17 @@ class TestAccountApi():
         })
         assert response.status_code == 400
     
+    def test_change_password_new_and_old_password_match_status_400(self,api_client,common_user):
+        url = reverse("accounts:api-v1:change-password")
+        user = common_user
+        api_client.force_authenticate(user=user)
+        response = api_client.put(url,data={
+        "old_password":"Sduwdsdas&12412",
+        "new_password":"Sduwdsdas&12412",
+        "new_password1":"Sduwdsdas&12412",
+        })
+        assert response.status_code == 400
+    
     def test_change_password_new_passwords_not_match_status_400(self,api_client,common_user):
         url = reverse("accounts:api-v1:change-password")
         user = common_user
@@ -234,16 +245,13 @@ class TestAccountApi():
 
         assert response.status_code == 401
     
-    def test_user_activation_confirm_status_200(self,api_client):
-        user= User.objects.create_user(
-        email="testemail@test.com", password="JKdsdas71&", is_verified=False,
-        )
+    def test_user_activation_confirm_status_200(self,api_client,common_user):
+        user= common_user
         refresh = RefreshToken.for_user(user)
         url = reverse("accounts:api-v1:activation-confirm",args=[refresh.access_token])
         response = api_client.get(url)
 
         assert response.status_code == 200
-        # assert user.is_verified == True
     
     def test_user_activation_invalid_token_status_400(self,api_client,common_user):
         user=common_user
@@ -262,5 +270,50 @@ class TestAccountApi():
     def test_reset_password_invalid_email_status_400(self,api_client,common_user):
         url = reverse("accounts:api-v1:reset-password")
         response = api_client.post(url,data={"email":"notfounduser@email.com"})
+
+        assert response.status_code == 400
+
+    def test_reset_password_confirm_status_200(self,api_client,common_user):
+        user= common_user
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:reset-password-confirm",args=[refresh.access_token])
+        response = api_client.post(url,data={
+            "new_password":"testnewpassword12*",
+            "new_password1":"testnewpassword12*",
+        })
+
+        assert response.status_code == 200
+    
+    def test_reset_password_confirm_invalid_token_status_400(self,api_client,common_user):
+        user= common_user
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:reset-password-confirm",args=[str(refresh.access_token)+"invalid_token"])
+        response = api_client.post(url,data={
+            "new_password":"testnewpassword12*",
+            "new_password1":"testnewpassword12*",
+        })
+
+        assert response.status_code == 400
+        
+
+    def test_reset_password_confirm_new_and_old_password_match_status_400(self,api_client,common_user):
+        user= common_user
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:reset-password-confirm",args=[str(refresh.access_token)])
+        response = api_client.post(url,data={
+            "new_password":"Sduwdsdas&12412*",
+            "new_password1":"Sduwdsdas&12412",
+        })
+
+        assert response.status_code == 400
+    
+    def test_reset_password_confirm_new_passwords_not_match_status_400(self,api_client,common_user):
+        user= common_user
+        refresh = RefreshToken.for_user(user)
+        url = reverse("accounts:api-v1:reset-password-confirm",args=[str(refresh.access_token)])
+        response = api_client.post(url,data={
+            "new_password":"testnewpassword12*",
+            "new_password1":"testnewpassword12*******",
+        })
 
         assert response.status_code == 400

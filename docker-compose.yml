@@ -12,6 +12,14 @@ services:
     environment:
        - "DJANGO_SECRET_KEY=${DOCKER_COMPOSE_DJANGO_SECRET_KEY}"
        - "DJANGO_DEBUG=${DOCKER_COMPOSE_DJANGO_DEBUG}"
+    depends_on:
+      - db
+    
+  
+  db:
+    image: postgres:14
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
     
   smtp4dev:
     image: rnwood/smtp4dev:v3

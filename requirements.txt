@@ -17,3 +17,6 @@ black
 flake8
 pytest
 pytest-django
+
+# databse 
+psycopg2-binary

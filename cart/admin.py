@@ -1,3 +1,7 @@
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
+from .models import Cart
 
-# Register your models here.
+@admin.register(Cart)
+class CartAdmin(ModelAdmin):
+    list_display = ["created_at"]

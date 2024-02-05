@@ -10,6 +10,7 @@ Pillow
 drf-yasg[validation]
 djangorestframework-simplejwt
 django-mail-templated
+django-debug-toolbar
 
 
 # refactoring and tests

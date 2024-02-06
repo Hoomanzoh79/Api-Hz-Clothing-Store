@@ -11,7 +11,7 @@ drf-yasg[validation]
 djangorestframework-simplejwt
 django-mail-templated
 django-debug-toolbar
-
+drf-nested-routers
 
 # refactoring and tests
 black

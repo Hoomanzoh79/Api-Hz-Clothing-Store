@@ -1,10 +1,12 @@
 from . import views
-from rest_framework.routers import DefaultRouter
-from django.urls import path
+from rest_framework_nested import routers
 
 app_name = "api-v1"
 
-router = DefaultRouter()
+router = routers.DefaultRouter()
 router.register("cart", views.CartViewSet, basename="cart")
 
-urlpatterns = router.urls
+cart_items_router = routers.NestedDefaultRouter(router,"cart",lookup="cart")
+cart_items_router.register("items",views.CartItemViewSet,basename="cart-items")
+
+urlpatterns = router.urls + cart_items_router.urls

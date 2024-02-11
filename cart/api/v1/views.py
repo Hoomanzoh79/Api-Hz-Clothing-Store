@@ -2,7 +2,7 @@ from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer
+from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer
 from cart.models import Cart,CartItem
 
 
@@ -15,6 +15,10 @@ class CartItemViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method=="POST":
             return AddCartItemSerializer
+        
+        elif self.request.method=="PATCH":
+            return UpdateCartItemSerializer
+        
         return CartItemSerializer
     
     def get_serializer_context(self):

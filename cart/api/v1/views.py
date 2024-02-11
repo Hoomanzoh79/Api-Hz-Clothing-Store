@@ -2,11 +2,16 @@ from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer
+from .serializers import (CartSerializer,
+                          CartItemSerializer,
+                          AddCartItemSerializer,
+                          UpdateCartItemSerializer)
+
 from cart.models import Cart,CartItem
 
 
 class CartItemViewSet(ModelViewSet):
+    http_method_names = ["get","post","patch","delete"]
     
     def get_queryset(self):
         cart_pk = self.kwargs["cart_pk"]
@@ -30,4 +35,4 @@ class CartViewSet(mixins.CreateModelMixin,
                    GenericViewSet):
     
     serializer_class = CartSerializer
-    queryset = Cart.objects.prefetch_related("items__cloth").all()
+    queryset = Cart.objects.prefetch_related("items__cloth").all() 

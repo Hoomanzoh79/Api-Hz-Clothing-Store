@@ -42,6 +42,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("cloths/", include("cloths.urls")),
     path("cart/", include("cart.urls")),
+    path("orders/",include("orders.urls")),
     # documentation
     path(
         "swagger/api.json",

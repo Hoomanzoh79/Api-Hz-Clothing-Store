@@ -5,5 +5,7 @@ app_name = "api-v1"
 
 router = routers.DefaultRouter()
 router.register("orders", views.OrderViewSet, basename="orders")
+order_items_router = routers.NestedDefaultRouter(router,"orders",lookup="orders")
+order_items_router.register("items",views.OrderItemViewSet,basename="order-items")
 
-urlpatterns = router.urls 
+urlpatterns = router.urls + order_items_router.urls

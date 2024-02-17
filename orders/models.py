@@ -1,9 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
+from accounts.models import Profile
 
 class Order(models.Model):
-    customer = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,related_name="orders")
+    customer = models.ForeignKey(Profile, on_delete=models.PROTECT,related_name="orders")
     is_paid = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
 

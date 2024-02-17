@@ -14,4 +14,4 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             return True
 
         # Instance must have an attribute named `author`.
-        return obj.customer.is_superuser & obj.customer.is_staff == True 
+        return obj.customer.user.is_superuser & obj.customer.user.is_staff == True 

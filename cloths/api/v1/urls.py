@@ -5,7 +5,7 @@ from django.urls import path
 app_name = "api-v1"
 
 router = DefaultRouter()
-router.register("cloths", views.ClothModelViewSet, basename="cloths")
+router.register("cloths", views.ClothModelViewSet, basename="cloth")
 
 urlpatterns = router.urls
 

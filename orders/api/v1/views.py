@@ -16,7 +16,7 @@ class OrderViewSet(ModelViewSet):
         if user.is_superuser & user.is_staff:
             return Order.objects.prefetch_related("items__cloth").select_related("customer").filter(is_cancelled=False)
         else:
-            return Order.objects.prefetch_related("items__cloth").select_related("customer").filter(is_cancelled=False,customer=user)
+            return Order.objects.prefetch_related("items__cloth").select_related("customer").filter(is_cancelled=False,customer=user.profile)
 
 
 class OrderItemViewSet(ModelViewSet):

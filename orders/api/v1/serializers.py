@@ -2,8 +2,18 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
 from orders.models import Order,OrderItem
-from accounts.models import User
+from accounts.models import User,Profile
 from cloths.models import Cloth
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField(method_name="get_email")
+    class Meta:
+        model = Profile
+        fields = ["id","first_name", "last_name", "address","email"]
+    
+    def get_email(self,profile):
+        return profile.user.email
 
 
 class OrderClothSerializer(ModelSerializer):
@@ -20,6 +30,7 @@ class OrderItemSerializer(ModelSerializer):
     
 
 class OrderSerializer(ModelSerializer):
+    customer = CustomerProfileSerializer()
     items = OrderItemSerializer(many=True,read_only=True)
     total_price = serializers.SerializerMethodField(method_name="get_total_price")
     class Meta:

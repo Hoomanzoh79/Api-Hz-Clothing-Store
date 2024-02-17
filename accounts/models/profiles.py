@@ -7,7 +7,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=250)
     last_name = models.CharField(max_length=250)
     image = models.ImageField(blank=True, null=True)
-    address = models.TextField()
+    address = models.TextField(blank=True,null=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

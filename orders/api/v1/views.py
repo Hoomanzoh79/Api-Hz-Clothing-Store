@@ -12,7 +12,7 @@ from accounts.models import Profile
 
 class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated,OrderIsAdminOrReadOnly]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         queryset = Order.objects.prefetch_related(
@@ -31,5 +31,5 @@ class OrderViewSet(ModelViewSet):
 class OrderItemViewSet(ModelViewSet):
     serializer_class = OrderItemSerializer
     queryset = OrderItem.objects.all()
-    permission_classes = [IsAuthenticated,OrderItemIsAdminOrReadOnly]
+    permission_classes = [IsAuthenticated]
         

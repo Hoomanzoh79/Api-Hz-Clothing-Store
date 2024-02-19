@@ -48,3 +48,12 @@ class OrderSerializer(ModelSerializer):
 
     def get_total_price(self,order):
         return sum([item.quantity * item.cloth.price for item in order.items.all()])
+    
+    def to_representation(self, instance):
+        request = self.context.get("request")
+        user = request.user
+        rep = super().to_representation(instance)
+        if user.is_staff & user.is_superuser:
+            return rep
+        rep.pop("customer")
+        return rep

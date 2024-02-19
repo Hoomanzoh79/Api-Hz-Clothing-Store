@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
 
 
-from .permissions import IsAdminOrReadOnly
+from .permissions import OrderIsAdminOrReadOnly,OrderItemIsAdminOrReadOnly
 from .serializers import OrderSerializer,OrderItemSerializer
 from orders.models import Order,OrderItem
 from accounts.models import Profile
@@ -12,7 +12,7 @@ from accounts.models import Profile
 
 class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated,IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticated,OrderIsAdminOrReadOnly]
     
     def get_queryset(self):
         queryset = Order.objects.prefetch_related(
@@ -31,4 +31,5 @@ class OrderViewSet(ModelViewSet):
 class OrderItemViewSet(ModelViewSet):
     serializer_class = OrderItemSerializer
     queryset = OrderItem.objects.all()
+    permission_classes = [IsAuthenticated,OrderItemIsAdminOrReadOnly]
         

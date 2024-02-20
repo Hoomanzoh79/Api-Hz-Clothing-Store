@@ -3,15 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
 
-
-from .permissions import OrderIsAdminOrReadOnly,OrderItemIsAdminOrReadOnly
-from .serializers import OrderSerializer,OrderItemSerializer
+from .serializers import (OrderSerializer,OrderItemSerializer,OrderCreateSerializer)
 from orders.models import Order,OrderItem
 from accounts.models import Profile
 
 
 class OrderViewSet(ModelViewSet):
-    serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
@@ -25,7 +22,15 @@ class OrderViewSet(ModelViewSet):
             return queryset
         
         return queryset.filter(customer__user_id=user.id)
-
+    
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return OrderCreateSerializer
+        
+        return OrderSerializer
+    
+    def get_serializer_context(self):
+        return {"user_id":self.request.user.id}
 
 
 class OrderItemViewSet(ModelViewSet):

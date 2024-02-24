@@ -18,7 +18,7 @@ class Cloth(models.Model):
     author = models.ForeignKey("accounts.Profile", on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
-    price = models.PositiveIntegerField(default=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     active = models.BooleanField(default=True)
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)

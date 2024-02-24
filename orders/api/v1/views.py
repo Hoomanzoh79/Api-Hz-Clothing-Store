@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from django.db.models import Prefetch
 from rest_framework.response import Response
 
-from .serializers import (OrderSerializer,OrderItemSerializer,OrderCreateSerializer)
+from .serializers import (OrderSerializer,OrderItemSerializer,
+                          OrderCreateSerializer,OrderUpdateSerializer)
 from orders.models import Order,OrderItem
 from accounts.models import Profile
 
@@ -31,6 +32,8 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == "POST":
             return OrderCreateSerializer
+        if self.request.method == "PATCH":
+            return OrderUpdateSerializer
         
         return OrderSerializer
     

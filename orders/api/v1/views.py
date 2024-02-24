@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from django.db.models import Prefetch
+from rest_framework.response import Response
 
 from .serializers import (OrderSerializer,OrderItemSerializer,OrderCreateSerializer)
 from orders.models import Order,OrderItem
@@ -9,7 +9,12 @@ from accounts.models import Profile
 
 
 class OrderViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    http_method_names = ["get","post","patch","delete","options","head"]
+
+    def get_permissions(self):
+        if self.request.method in ["PATCH","DELETE"]:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
     
     def get_queryset(self):
         queryset = Order.objects.prefetch_related(
@@ -32,6 +37,14 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {"user_id":self.request.user.id}
 
+    def create(self, request, *args, **kwargs):
+        create_order_serializer = OrderCreateSerializer(data=request.data,
+                                                        context={"user_id":self.request.user.id},
+                                                        )
+        create_order_serializer.is_valid(raise_exception=True)
+        created_order = create_order_serializer.save()
+        serializer = OrderSerializer(created_order)
+        return Response(serializer.data)
 
 class OrderItemViewSet(ModelViewSet):
     serializer_class = OrderItemSerializer

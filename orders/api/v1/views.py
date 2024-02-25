@@ -4,7 +4,7 @@ from django.db.models import Prefetch
 from rest_framework.response import Response
 
 from .serializers import (OrderSerializer,OrderItemSerializer,
-                          OrderCreateSerializer,OrderUpdateSerializer)
+                          OrderCreateSerializer,OrderUpdateSerializer,OrderForAdminSerializer)
 from orders.models import Order,OrderItem
 from orders.signals import order_created
 
@@ -34,6 +34,8 @@ class OrderViewSet(ModelViewSet):
             return OrderCreateSerializer
         if self.request.method == "PATCH":
             return OrderUpdateSerializer
+        if self.request.user.is_staff & self.request.user.is_superuser:
+            return OrderForAdminSerializer
         
         return OrderSerializer
     

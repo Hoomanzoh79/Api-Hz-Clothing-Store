@@ -29,21 +29,22 @@ class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ["id","cloth","quantity","price"]
+
+class OrderForAdminSerializer(ModelSerializer):
+    items = OrderItemSerializer(many=True)
+    customer = CustomerProfileSerializer()
+    class Meta:
+        model = Order
+        fields = ["id","customer","items","is_paid",
+                  "is_cancelled","datetime_created",]
     
 
 class OrderSerializer(ModelSerializer):
-    customer = CustomerProfileSerializer()
-    items = OrderItemSerializer(many=True,read_only=True)
+    items = OrderItemSerializer(many=True)
     class Meta:
         model = Order
-        fields = ["id","items","customer","is_paid",
+        fields = ["id","items","is_paid",
                   "is_cancelled","datetime_created",]
-        read_only_fields = ["customer"]
-    
-    def create(self, validated_data):
-        request = self.context.get("request")
-        validated_data["customer"] = User.objects.get(id=request.user.id)
-        return super().create(validated_data)
 
 class OrderCreateSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()

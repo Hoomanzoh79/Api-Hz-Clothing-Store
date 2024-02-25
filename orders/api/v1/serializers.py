@@ -44,15 +44,6 @@ class OrderSerializer(ModelSerializer):
         request = self.context.get("request")
         validated_data["customer"] = User.objects.get(id=request.user.id)
         return super().create(validated_data)
-    
-    def to_representation(self, instance):
-        user = User.objects.get(id=self.context["user_id"])
-        rep = super().to_representation(instance)
-        if user.is_staff & user.is_superuser:
-            return rep
-        rep.pop("customer")
-        return rep
-
 
 class OrderCreateSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()

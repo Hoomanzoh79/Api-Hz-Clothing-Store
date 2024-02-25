@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from .serializers import (OrderSerializer,OrderItemSerializer,
                           OrderCreateSerializer,OrderUpdateSerializer)
 from orders.models import Order,OrderItem
-from accounts.models import Profile
+from orders.signals import order_created
 
 
 class OrderViewSet(ModelViewSet):
@@ -46,6 +46,9 @@ class OrderViewSet(ModelViewSet):
                                                         )
         create_order_serializer.is_valid(raise_exception=True)
         created_order = create_order_serializer.save()
+
+        order_created.send_robust(self.__class__,order=created_order)
+
         serializer = OrderSerializer(created_order)
         return Response(serializer.data)
 

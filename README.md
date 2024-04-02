@@ -1,5 +1,6 @@
 # Api-Hz-Clothing-Store
- This is an online store project using  django rest framework
+ This is an online store project using  django rest framework.
+
  Languages and Tools:
  
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)

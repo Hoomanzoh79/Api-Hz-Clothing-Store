@@ -44,7 +44,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
         cloth = get_object_or_404(Cloth, id=cloth_id)
         if Comment.objects.filter(cloth=cloth, author=self.request.user).exists():
             raise serializers.ValidationError(
-                {"Message": "You have already added comment on this blog"}
+                {"Message": "You have already added comment on this product"}
             )
         serializer.save(author=self.request.user, cloth=cloth)
 
@@ -61,7 +61,7 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
         cloth_id = self.kwargs.get("cloth_id")
         if comment.cloth.id != cloth_id:
             raise serializers.ValidationError(
-                {"Message": "This comment is not related to the requested blog"}
+                {"Message": "This comment is not related to the requested product"}
             )
         return comment
 

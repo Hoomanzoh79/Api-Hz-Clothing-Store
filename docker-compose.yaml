@@ -10,16 +10,36 @@ services:
     ports:
       - 8000:8000
     environment:
-       - "DJANGO_SECRET_KEY=${DOCKER_COMPOSE_DJANGO_SECRET_KEY}"
-       - "DJANGO_DEBUG=${DOCKER_COMPOSE_DJANGO_DEBUG}"
+      - DJANGO_SECRET_KEY=test
+      - DJANGO_DEBUG=true
     depends_on:
       - db
-    
   
   db:
-    image: postgres:14
+    restart: always
+    image: postgres
+    container_name: demo-postgres #you can change this
     environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+      - POSTGRES_PORT=test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: demo-pgadmin #you can change this
+    depends_on:
+      - db
+    ports:
+      - "5051:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test
+      - PGADMIN_DEFAULT_PASSWORD=test
+    restart: always
     
   smtp4dev:
     image: rnwood/smtp4dev:v3
@@ -39,3 +59,4 @@ services:
 
 volumes:
   smtp4dev-data:
+  postgres_data:

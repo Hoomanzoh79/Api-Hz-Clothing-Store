@@ -21,3 +21,4 @@ pytest-django
 
 # databse 
 psycopg2-binary
+django_postgres_extensions

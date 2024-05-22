@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.core.validators import MinValueValidator
 
 
 class Cloth(models.Model):
@@ -18,7 +19,7 @@ class Cloth(models.Model):
     author = models.ForeignKey("accounts.Profile", on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.PositiveIntegerField(validators=[MinValueValidator(50000)],default=0,verbose_name=_("price"))
     active = models.BooleanField(default=True)
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)

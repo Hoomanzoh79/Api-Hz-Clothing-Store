@@ -29,23 +29,22 @@ class ClothModelViewSet(viewsets.ModelViewSet):
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.select_related('cloth','author').all()
     serializer_class = CommentSerializer
     pagination_class = DefaultPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         cloth_id = self.kwargs.get("cloth_id")
-        cloth = get_object_or_404(Cloth, id=cloth_id)
-        return Comment.objects.filter(cloth=cloth)
+        return Comment.objects.select_related('author','cloth').filter(cloth__id=cloth_id)
 
     def perform_create(self, serializer):
         cloth_id = self.kwargs.get("cloth_id")
         cloth = get_object_or_404(Cloth, id=cloth_id)
-        if Comment.objects.filter(cloth=cloth, author=self.request.user).exists():
-            raise serializers.ValidationError(
-                {"Message": "You have already added comment on this product"}
-            )
+        # if Comment.objects.filter(cloth=cloth, author=self.request.user).exists():
+        #     raise serializers.ValidationError(
+        #         {"Message": "You have already added comment on this product"}
+        #     )
         serializer.save(author=self.request.user, cloth=cloth)
 
 

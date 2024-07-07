@@ -2,7 +2,7 @@ from django.db import models
 from accounts.models import Profile
 
 class Order(models.Model):
-    customer = models.OneToOneField(Profile, on_delete=models.PROTECT,related_name="orders")
+    customer = models.ForeignKey(Profile, on_delete=models.PROTECT,related_name="orders")
     is_paid = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
 

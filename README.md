@@ -1,5 +1,5 @@
 # Api-Hz-Clothing-Store
- This is an online store project using  Django Rest Framework.
+ This is a Rest API for an online store project using  Django Rest Framework.
 
  Languages and Tools:
  

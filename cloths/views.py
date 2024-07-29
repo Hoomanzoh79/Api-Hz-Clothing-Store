@@ -15,3 +15,6 @@ from orders.models import Order,OrderItem
 #         results = cursor.fetchall()
 
 #     return render(request,"cloths/hello.html")
+
+def index(request):
+    return render(request, 'index.html')

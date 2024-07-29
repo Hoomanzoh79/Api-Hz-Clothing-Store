@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # 3rd party
     "mail_templated",
     "debug_toolbar",
+    "corsheaders",
     # my apps
     "accounts",
     "cloths",
@@ -57,6 +58,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     # django debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 
@@ -197,3 +200,8 @@ def show_toolbar(request):
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
 }
+
+# cors headers 
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5500",
+]
